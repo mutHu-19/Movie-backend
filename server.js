@@ -10,7 +10,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Add a root route handler
+
 app.get("/", (req, res) => {
   res.json({ message: "Movie API is running" });
 });

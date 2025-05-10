@@ -10,7 +10,11 @@ const {
 } = require('../controllers/userController.js');
 const { protect } = require('../middleware/authMiddleware.js');
 
-router.post('/register', register);
+router.post('/register', async (req, res) => {
+  const { username, email, password } = req.body;
+  // Confirm validation, hashing, saving to DB, and returning a token.
+});
+
 router.post('/login', login);
 router.get('/profile', protect, getProfile);
 
