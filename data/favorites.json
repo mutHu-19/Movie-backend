@@ -1,0 +1,11 @@
+{
+  "admin": [
+    {
+      "id": 123,
+      "title": "Inception",
+      "release_date": "2010-07-16",
+      "poster_path": "/image.jpg",
+      "vote_average": 8.3
+    }
+  ]
+}
