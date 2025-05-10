@@ -7,7 +7,7 @@ const favoritesRoutes = require('./routes/userRoutes.js');
 dotenv.config();
 const app = express();
 
-app.use(cors());
+app.use(cors({ origin: 'https://movie-explorer-rose.vercel.app' }));
 app.use(express.json());
 
 // Add a root route handler
