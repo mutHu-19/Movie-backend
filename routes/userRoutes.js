@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const {
-  register,
-  login,
+  registerUser,
+  loginUser,
   getProfile,
   deleteFavourites,
   getFavourites,
@@ -10,12 +10,9 @@ const {
 } = require('../controllers/userController.js');
 const { protect } = require('../middleware/authMiddleware.js');
 
-router.post('/register', async (req, res) => {
-  const { username, email, password } = req.body;
-  // Confirm validation, hashing, saving to DB, and returning a token.
-});
 
-router.post('/login', login);
+router.post('/register', registerUser);
+router.post('/login', loginUser);
 router.get('/profile', protect, getProfile);
 
 router.get('/:username', getFavourites);

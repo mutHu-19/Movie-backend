@@ -7,7 +7,15 @@ const favoritesRoutes = require('./routes/userRoutes.js');
 dotenv.config();
 const app = express();
 
-app.use(cors());
+const allowedOrigins = ['https://movie-frontend-blue.vercel.app'];
+
+const cors = require('cors');
+app.use(cors({
+  origin: 'https://movie-frontend-blue.vercel.app',
+  credentials: true
+}));
+
+
 app.use(express.json());
 
 

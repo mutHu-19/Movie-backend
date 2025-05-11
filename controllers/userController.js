@@ -1,55 +1,74 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
-const {readFavourites, writeFavourites} = require('../utils/storage.js');
 
-// Generate JWT
-const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-};
+// Configuration
+const SALT_ROUNDS = 10;
+const JWT_CONFIG = { expiresIn: '7d' };
 
-// Register user
-exports.register = async (req, res) => {
+// Helper functions
+const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, JWT_CONFIG);
+
+const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
+  
   try {
-    const userExists = await User.findOne({ email });
-    if (userExists) return res.status(400).json({ message: 'User already exists' });
+    // Check for existing user
+    if (await User.findOne({ email })) {
+      return res.status(400).json({ message: 'Email already in use' });
+    }
 
-    const hashed = await bcrypt.hash(password, 10);
-    const user = await User.create({ username, email, password: hashed });
+    // Create user
+    const user = await User.create({
+      username,
+      email,
+      password: await bcrypt.hash(password, SALT_ROUNDS)
+    });
 
+    // Return response
     res.status(201).json({
       _id: user._id,
       username: user.username,
       email: user.email,
-      token: generateToken(user._id),
-      message: "New User registered!",
+      token: generateToken(user._id)
     });
+
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Registration error:', err);
+    res.status(500).json({ message: 'Server error during registration' });
   }
 };
 
-// Login user
-exports.login = async (req, res) => {
+const loginUser = async (req, res) => {
   const { email, password } = req.body;
+
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(400).json({ message: 'Invalid credentials' });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
 
     res.json({
       _id: user._id,
       username: user.username,
       email: user.email,
-      token: generateToken(user._id),
-      message:  `${user.username} you have login successfully`,
+      token: generateToken(user._id)
     });
+
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Login error:', err);
+    res.status(500).json({ message: 'Server error during login' });
   }
+};
+
+module.exports = {
+  register: registerUser,
+  login: loginUser
 };
 
 // Get current user (protected route)

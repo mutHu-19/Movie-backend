@@ -5,5 +5,11 @@
   ],
   "routes": [
     { "src": "/(.*)", "dest": "server.js" }
-  ]
+  ],
+
+  "functions": {
+    "api/users/register.js": {
+      "maxDuration": 30  
+    }
+  }
 }
