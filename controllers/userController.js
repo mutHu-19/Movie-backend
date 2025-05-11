@@ -11,26 +11,26 @@ const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, JWT_CONFI
 
 const registerUser = async (req, res) => {
   const { username, email, password } = req.body;
-  
   try {
-    // Check for existing user
     if (await User.findOne({ email })) {
       return res.status(400).json({ message: 'Email already in use' });
     }
 
-    // Create user
+    const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+
     const user = await User.create({
       username,
       email,
-      password: await bcrypt.hash(password, SALT_ROUNDS)
+      password: hashedPassword
     });
 
-    // Return response
+    const token = generateToken(user._id);
+
     res.status(201).json({
       _id: user._id,
       username: user.username,
       email: user.email,
-      token: generateToken(user._id)
+      token
     });
 
   } catch (err) {
@@ -41,15 +41,9 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(401).json({ message: 'Invalid credentials' });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
@@ -66,10 +60,6 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = {
-  register: registerUser,
-  login: loginUser
-};
 
 // Get current user (protected route)
 exports.getProfile = async (req, res) => {
@@ -125,3 +115,8 @@ exports.saveFavourite = (req, res) => {
       message: 'Movie removed from favorites'
     });
   };
+
+  module.exports = {
+  registerUser,
+  loginUser
+};

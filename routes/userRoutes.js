@@ -4,19 +4,19 @@ const {
   registerUser,
   loginUser,
   getProfile,
-  deleteFavourites,
+  saveFavourite,
   getFavourites,
-  saveFavourite
-} = require('../controllers/userController.js');
-const { protect } = require('../middleware/authMiddleware.js');
+  deleteFavourites
+} = require('../controllers/userController');
 
-
+// Auth
 router.post('/register', registerUser);
 router.post('/login', loginUser);
-router.get('/profile', protect, getProfile);
+router.get('/profile', getProfile);
 
-router.get('/:username', getFavourites);
-router.post('/:username', saveFavourite);
-router.delete('/:username/:id', deleteFavourites);
+// Favorites
+router.post('/:username/favorites', saveFavourite);
+router.get('/:username/favorites', getFavourites);
+router.delete('/:username/favorites/:id', deleteFavourites);
 
 module.exports = router;
