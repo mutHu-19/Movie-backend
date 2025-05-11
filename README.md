@@ -1,156 +1,173 @@
-🎬 Movie Explorer Backend
-This is the backend service for the Movie Explorer application, providing RESTful APIs for movie data retrieval, user authentication, and user-specific functionalities like managing favorite movies.
 
-🚀 Features
-User Authentication: Secure user registration and login functionalities.
+# 🎬 Movie Explorer Backend
 
-Favorites Management: Users can add or remove movies from their favorites list.
+This is the backend service for the **Movie Explorer** application, providing RESTful APIs for movie data retrieval, user authentication, and user-specific functionalities like managing favorite movies.
 
-Middleware Integration: Utilizes middleware for authentication and error handling.
+---
 
-Deployment Ready: Configured for deployment on platforms like Vercel.
-GitHub
-+1
-GitHub
-+1
+## 🚀 Features
 
-🛠️ Project Setup
-Prerequisites
-Node.js (v14 or higher)
+* **User Authentication**: Secure user registration and login functionalities.
+* **Favorites Management**: Users can add or remove movies from their favorites list.
+* **Middleware Integration**: Utilizes middleware for authentication and error handling.
+* **Deployment Ready**: Configured for deployment on platforms like Vercel.([GitHub][1])
 
-npm (v6 or higher)
+---
 
-MongoDB instance (local or cloud-based)
+## 🛠️ Project Setup
 
-Installation
-Clone the Repository:
+### Prerequisites
 
-bash
-Copy
-Edit
-git clone https://github.com/mutHu-19/Movie-backend.git
-cd Movie-backend
-Install Dependencies:
+* **Node.js** (v14 or higher)
+* **npm** (v6 or higher)
+* **MongoDB** instance (local or cloud-based)
 
-bash
-Copy
-Edit
-npm install
-Configure Environment Variables:
+### Installation
 
-Create a .env file in the root directory and add the following:
+1. **Clone the Repository**:
 
-env
-Copy
-Edit
-PORT=5000
-MONGO_URI=your_mongodb_connection_string
-JWT_SECRET=your_jwt_secret_key
-TMDB_API_KEY = your_tmdb_api_key
-
-Start the Server:
-
-bash
-Copy
-Edit
-npm run dev
-The server should now be running at http://localhost:5000.
-
-📚 API Usage
-Authentication
-Register User
-
-Endpoint: POST /api/auth/register
-
-Body:
-
-json
-Copy
-Edit
-{
-  "username": "john_doe",
-  "email": "john@example.com",
-  "password": "securepassword"
-}
-Login User
-
-Endpoint: POST /api/auth/login
-
-Body:
-LinkedIn
-
-json
-Copy
-Edit
-{
-  "email": "john@example.com",
-  "password": "securepassword"
-}
-Movies
-Get All Movies
-
-Endpoint: GET /api/movies
-
-Get Movie by ID
-
-Endpoint: GET /api/movies/:id
+   ```bash
+   git clone https://github.com/mutHu-19/Movie-backend.git
+   cd Movie-backend
+   ```
 
 
-Favorites
-Add to Favorites
 
-Endpoint: POST /api/users/favorites
+2. **Install Dependencies**:
 
-Headers:
-Stack Overflow
-+5
-GitHub
-+5
-GitHub
-+5
+   ```bash
+   npm install
+   ```
 
-http
-Copy
-Edit
-Authorization: Bearer <token>
-Body:
 
-json
-Copy
-Edit
-{
-  "movieId": "movie_id_here"
-}
-Get User Favorites
 
-Endpoint: GET /api/users/favorites
+3. **Configure Environment Variables**:
 
-Headers:
-GitHub
-+3
-GitHub
-+3
-GitHub
-+3
+   Create a `.env` file in the root directory and add the following:
 
-http
-Copy
-Edit
-Authorization: Bearer <token>
-Remove from Favorites
+   ```env
+   PORT=5000
+   MONGO_URI=your_mongodb_connection_string
+   JWT_SECRET=your_jwt_secret_key
+   TMDB_API_KEY = your_tmdb_api_key
+   ```
 
-Endpoint: DELETE /api/users/favorites/:movieId
 
-Headers:
 
-http
-Copy
-Edit
-Authorization: Bearer <token>
-🧾 Folder Structure
-plaintext
-Copy
-Edit
+4. **Start the Server**:
+
+   ```bash
+   npm start
+   ```
+
+
+
+The server should now be running at `http://localhost:5000`.
+
+---
+
+## 📚 API Usage
+
+### Authentication
+
+* **Register User**
+
+  * **Endpoint**: `POST /api/auth/register`
+  * **Body**:
+
+    ```json
+    {
+      "username": "john_doe",
+      "email": "john@example.com",
+      "password": "securepassword"
+    }
+    ```
+
+* **Login User**
+
+  * **Endpoint**: `POST /api/auth/login`
+  * **Body**:([LinkedIn][2])
+
+    ```json
+    {
+      "email": "john@example.com",
+      "password": "securepassword"
+    }
+    ```
+
+### Movies
+
+* **Get All Movies**
+
+  * **Endpoint**: `GET /api/movies`
+
+* **Get Movie by ID**
+
+  * **Endpoint**: `GET /api/movies/:id`
+
+* **Add New Movie** *(Admin Only)*
+
+  * **Endpoint**: `POST /api/movies`
+
+  * **Headers**:([GitHub][1])
+
+    ```http
+    Authorization: Bearer <token>
+    ```
+
+  * **Body**:
+
+    ```json
+    {
+      "title": "Inception",
+      "description": "A mind-bending thriller",
+      "releaseYear": 2010
+    }
+    ```
+
+### Favorites
+
+* **Add to Favorites**
+
+  * **Endpoint**: `POST /api/users/favorites`
+
+  * **Headers**:([GitHub][3])
+
+    ```http
+    Authorization: Bearer <token>
+    ```
+
+  * **Body**:
+
+    ```json
+    {
+      "movieId": "movie_id_here"
+    }
+    ```
+
+* **Get User Favorites**
+
+  * **Endpoint**: `GET /api/users/favorites`
+  * **Headers**:([GitHub][3])
+
+    ```http
+    Authorization: Bearer <token>
+    ```
+
+* **Remove from Favorites**
+
+  * **Endpoint**: `DELETE /api/users/favorites/:movieId`
+  * **Headers**:
+
+    ```http
+    Authorization: Bearer <token>
+    ```
+
+---
+
+## 🧾 Folder Structure
+
+```plaintext
 Movie-backend/
 ├── config/             # Configuration files (e.g., DB connection)
 ├── controllers/        # Route handlers
@@ -163,7 +180,15 @@ Movie-backend/
 ├── package.json
 ├── server.js           # Entry point
 └── vercel.json         # Vercel deployment configuration
-🌐 Deployment
+```
+
+
+
+---
+
+## 🌐 Deployment
+
 The backend is configured for deployment on Vercel. Ensure that environment variables are set appropriately in the Vercel dashboard.
 
-For more details, visit the Movie Explorer Backend Repository.
+---
+
