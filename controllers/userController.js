@@ -10,49 +10,55 @@ const JWT_CONFIG = { expiresIn: '7d' };
 const generateToken = (id) => jwt.sign({ id }, process.env.JWT_SECRET, JWT_CONFIG);
 
 const registerUser = async (req, res) => {
+  console.time('Registration Time');
   const { username, email, password } = req.body;
+
   try {
-    if (await User.findOne({ email })) {
+    console.time('User Exists Check');
+    const userExists = await User.findOne({ email }).lean();
+    console.timeEnd('User Exists Check');
+
+    if (userExists) {
       return res.status(400).json({ message: 'Email already in use' });
     }
 
+    console.time('Password Hashing');
     const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+    console.timeEnd('Password Hashing');
 
-    const user = await User.create({
-      username,
-      email,
-      password: hashedPassword
-    });
-
-    const token = generateToken(user._id);
+    console.time('User Creation');
+    const user = await User.create({ username, email, password: hashedPassword });
+    console.timeEnd('User Creation');
 
     res.status(201).json({
       _id: user._id,
       username: user.username,
       email: user.email,
-      token
+      token: generateToken(user._id),
     });
-
   } catch (err) {
-    console.error('Registration error:', err);
-    res.status(500).json({ message: 'Server error during registration' });
+    console.error('Registration Error:', err);
+    res.status(500).json({ message: 'Registration failed', error: err.message });
+  } finally {
+    console.timeEnd('Registration Time');
   }
 };
-
+// Login User
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
-      return res.status(401).json({ message: 'Invalid credentials' });
+    
+    if (user && (await bcrypt.compare(password, user.password))) {
+      res.json({
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        token: generateToken(user._id)
+      });
+    } else {
+      res.status(401).json({ message: 'Invalid credentials' });
     }
-
-    res.json({
-      _id: user._id,
-      username: user.username,
-      email: user.email,
-      token: generateToken(user._id)
-    });
 
   } catch (err) {
     console.error('Login error:', err);
@@ -60,63 +66,69 @@ const loginUser = async (req, res) => {
   }
 };
 
-
 // Get current user (protected route)
-exports.getProfile = async (req, res) => {
-  res.json(req.user);
+const getProfile = async (req, res) => {
+  res.json({
+    _id: req.user._id,
+    username: req.user.username,
+    email: req.user.email
+  });
 };
 
-
 // Save favourite movie
-exports.saveFavourite = (req, res) => {
-    const { username } = req.params;
-    const movie = req.body;
-  
-    const favorites = readFavourites();
-  
-    if (!favorites[username]) {
-      favorites[username] = [];
-    }
-  
-    const alreadyExists = favorites[username].some(m => m.id === movie.id);
-  
-    if (alreadyExists) {
-      return res.status(400).json({ message: 'Movie already in favorites' });
-    }
-  
-    favorites[username].push(movie);
-    writeFavourites(favorites);
-  
-    res.json({ message: 'Movie added to favorites' });
-  };
-  
-  // Get favourite movies
-  exports.getFavourites = (req, res) => {
-    const { username } = req.params;
-    const favorites = readFavourites();
-    res.json(favorites[username] || []);
-  };
-  
-  // Remove a favourite
-  exports.deleteFavourites = (req, res) => {
-    const { username, id } = req.params;
-    const favorites = readFavourites();
-  
-    if (!favorites[username]) {
-      return res.status(404).json({
-        message: `No favorites found for user ${username}`
-      });
-    }
-  
-    favorites[username] = favorites[username].filter(movie => movie.id !== parseInt(id));
-    writeFavourites(favorites);
-  
-    res.json({
-      message: 'Movie removed from favorites'
-    });
-  };
+const saveFavourite = (req, res) => {
+  const { username } = req.params;
+  const movie = req.body;
 
-  module.exports = {
+  const favorites = readFavourites();
+
+  if (!favorites[username]) {
+    favorites[username] = [];
+  }
+
+  const alreadyExists = favorites[username].some(m => m.id === movie.id);
+
+  if (alreadyExists) {
+    return res.status(400).json({ message: 'Movie already in favorites' });
+  }
+
+  favorites[username].push(movie);
+  writeFavourites(favorites);
+
+  res.json({ message: 'Movie added to favorites' });
+};
+
+// Get favourite movies
+const getFavourites = (req, res) => {
+  const { username } = req.params;
+  const favorites = readFavourites();
+  res.json(favorites[username] || []);
+};
+
+// Remove a favourite
+const deleteFavourites = (req, res) => {
+  const { username, id } = req.params;
+  const favorites = readFavourites();
+
+  if (!favorites[username]) {
+    return res.status(404).json({
+      message: `No favorites found for user ${username}`
+    });
+  }
+
+  favorites[username] = favorites[username].filter(movie => movie.id !== parseInt(id));
+  writeFavourites(favorites);
+
+  res.json({
+    message: 'Movie removed from favorites'
+  });
+};
+
+module.exports = {
   registerUser,
-  loginUser
+  loginUser,
+  getProfile,
+  saveFavourite,
+  getFavourites,
+  deleteFavourites
 };
